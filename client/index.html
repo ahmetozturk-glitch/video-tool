@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AE Team Tool v1</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">AE</div>
+          <div>
+            <p class="brand-title">Team Tool</p>
+            <p class="brand-sub">CEP v1</p>
+          </div>
+        </div>
+
+        <nav class="nav" id="nav"></nav>
+
+        <div class="sidebar-foot">
+          <p id="syncStatus">Sync: kontrol edilmedi</p>
+        </div>
+      </aside>
+
+      <main class="content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">After Effects Workflow</p>
+            <h1 id="screenTitle">Home</h1>
+          </div>
+          <button class="btn btn-ghost" id="checkUpdatesBtn">Update Check</button>
+        </header>
+
+        <section id="screenRoot" class="screen-root"></section>
+      </main>
+
+      <aside class="context-panel">
+        <h2>Context</h2>
+        <div class="context-card">
+          <p class="context-label">Active Comp</p>
+          <p class="context-value" id="activeComp">-</p>
+        </div>
+        <div class="context-card">
+          <p class="context-label">Selected Layer</p>
+          <p class="context-value" id="selectedLayer">-</p>
+        </div>
+        <div class="context-card">
+          <p class="context-label">Quick Actions</p>
+          <div class="quick-list">
+            <button class="btn btn-small" data-action="go-presets">Apply Preset</button>
+            <button class="btn btn-small" data-action="go-legal">Generate Legal</button>
+            <button class="btn btn-small" data-action="go-render">Render Draft</button>
+            <button class="btn btn-small btn-ghost" id="refreshContextBtn">Refresh Context</button>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <template id="homeTemplate">
+      <div class="grid two-col">
+        <article class="card">
+          <h3>Quick Start</h3>
+          <div class="button-stack">
+            <button class="btn" data-action="go-presets">Apply Text Preset</button>
+            <button class="btn" data-action="go-asset">Animate PNG Button</button>
+            <button class="btn" data-action="go-legal">Generate Legal Crawl</button>
+            <button class="btn" data-action="go-render">Render Draft</button>
+          </div>
+        </article>
+        <article class="card">
+          <h3>Calisma Notu</h3>
+          <ul class="list">
+            <li>AE'de comp ac ve layer sec</li>
+            <li>Preset/Asset islemi uygula</li>
+            <li>Legal metni tek tikla olustur</li>
+          </ul>
+        </article>
+      </div>
+    </template>
+
+    <template id="presetTemplate">
+      <div class="card">
+        <div class="row between">
+          <h3>Preset Gallery</h3>
+          <select id="presetFilter" class="input">
+            <option value="all">Tum Kategoriler</option>
+            <option value="text">Text</option>
+            <option value="button">Button</option>
+            <option value="legal">Legal</option>
+            <option value="logo">Logo</option>
+          </select>
+        </div>
+        <div id="presetList" class="preset-grid"></div>
+      </div>
+    </template>
+
+    <template id="assetTemplate">
+      <div class="grid two-col">
+        <article class="card">
+          <h3>Asset Animator</h3>
+          <label class="label">Animasyon Stili</label>
+          <select id="assetMotion" class="input">
+            <option>Button Pop</option>
+            <option>Fade + Slide</option>
+            <option>Scale In</option>
+          </select>
+
+          <label class="label">Sure (sn)</label>
+          <input id="assetDuration" class="input" type="number" step="0.1" min="0.1" value="0.6" />
+
+          <div class="toggle-row">
+            <label><input id="autoAnchor" type="checkbox" checked /> Auto Anchor</label>
+            <label><input id="autoFit" type="checkbox" checked /> Auto Fit</label>
+          </div>
+
+          <button id="applyAssetAnim" class="btn">Uygula</button>
+        </article>
+
+        <article class="card card-muted">
+          <h3>Beklenen Cikti</h3>
+          <ul class="list">
+            <li>Anchor center'a alinacak</li>
+            <li>Scale/opacity keyframe eklenecek</li>
+            <li>Easing atanacak</li>
+          </ul>
+          <p id="assetResult" class="result">Hazir</p>
+        </article>
+      </div>
+    </template>
+
+    <template id="legalTemplate">
+      <div class="grid two-col">
+        <article class="card">
+          <h3>Text & Legal Automation</h3>
+          <label class="label">Legal Metin</label>
+          <textarea id="legalInput" class="input textarea" placeholder="Excel'den legal metni buraya yapistir..."></textarea>
+
+          <div class="row">
+            <div>
+              <label class="label">Yon</label>
+              <select id="legalDirection" class="input">
+                <option value="ltr">Soldan Saga</option>
+                <option value="rtl">Sagdan Sola</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Hiz (px/sn)</label>
+              <input id="legalSpeed" class="input" type="number" value="110" />
+            </div>
+          </div>
+
+          <button id="generateLegal" class="btn">Legal Crawl Olustur</button>
+        </article>
+
+        <article class="card card-muted">
+          <h3>Kontrol</h3>
+          <ul class="list" id="legalChecks">
+            <li>Karakter limiti: bekleniyor</li>
+            <li>Safe area: bekleniyor</li>
+            <li>Satir temizligi: bekleniyor</li>
+          </ul>
+          <p id="legalResult" class="result">Hazir</p>
+        </article>
+      </div>
+    </template>
+
+    <template id="renderTemplate">
+      <div class="card">
+        <h3>Render Manager</h3>
+        <div class="row">
+          <div>
+            <label class="label">Profil</label>
+            <select id="renderProfile" class="input">
+              <option>Draft H264</option>
+              <option>Final ProRes</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">Naming</label>
+            <input id="renderName" class="input" value="{campaign}_{format}_{date}" />
+          </div>
+        </div>
+        <button id="queueRender" class="btn">Queue'ya Ekle</button>
+        <p id="renderResult" class="result">Queue bos</p>
+      </div>
+    </template>
+
+    <template id="updateTemplate">
+      <div class="card">
+        <h3>Update & Sync Center</h3>
+        <p>Mevcut Surum: <strong id="currentVersion">1.0.0</strong></p>
+        <p>Son Surum: <strong id="latestVersion">1.1.0</strong></p>
+        <p class="muted">Yenilik: 4 yeni text preset + legal cleanup.</p>
+        <div class="row">
+          <button id="updateNow" class="btn">Update Now</button>
+          <button id="rollback" class="btn btn-ghost">Rollback</button>
+        </div>
+        <p id="updateResult" class="result">Bekliyor</p>
+      </div>
+    </template>
+
+    <template id="settingsTemplate">
+      <div class="card">
+        <h3>Settings</h3>
+        <div class="row">
+          <div>
+            <label class="label">Team Profile</label>
+            <select class="input">
+              <option>Default Brand TR</option>
+              <option>Default Brand EU</option>
+            </select>
+          </div>
+          <div>
+            <label class="label">FPS</label>
+            <input class="input" type="number" value="25" />
+          </div>
+        </div>
+        <p class="muted">v1 local profile ile calisir.</p>
+      </div>
+    </template>
+
+    <script src="./main.js"></script>
+  </body>
+</html>
